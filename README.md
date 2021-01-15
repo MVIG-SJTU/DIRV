@@ -71,7 +71,7 @@ Download the pre-trained weight of our backbone [here](https://drive.google.com/
 ### Training on V-COCO Dataset
 
 ```
-CUDA_VISIBLE_DEVICES=0,1,2,3 python train.py --batch_size 32 --load_weights weights/efficientdet-d3_vcoco.pth
+CUDA_VISIBLE_DEVICES=0,1,2,3 python train_vcoco.py --batch_size 32 --load_weights weights/efficientdet-d3_vcoco.pth
 ```
 
 You may adjust the saving directory and GPU number in `projects/vcoco.yaml` or create your own projects in `projects/`.
