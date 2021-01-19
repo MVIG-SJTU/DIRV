@@ -1,7 +1,7 @@
 # DIRV: Dense Interaction Region Voting for End-to-End Human-Object Interaction Detection
 
 <div align="center">
-    <img src="compare.png", width="500">
+    <img src="compare.png", width="600">
 </div>
 
 Official code implementation for the paper "DIRV: Dense Interaction Region Voting for End-to-End Human-Object Interaction Detection" (AAAI 2021) [paper](https://arxiv.org/abs/2010.01005).
@@ -96,4 +96,16 @@ CUDA_VISIBLE_DEVICES=0 python test_vcoco.py -w $path to the checkpoint$
 ### Test on HICO-DET Dataset
 
 Coming soon.
+
+## Citation
+
+If you found our paper or code useful for your research, please cite the following paper:
+```
+@inproceedings{fang2020dirv,
+      title={DIRV: Dense Interaction Region Voting for End-to-End Human-Object Interaction Detection}, 
+      author={Fang, Hao-Shu and Xie, Yichen and Shao, Dian and Lu, Cewu},
+      year={2021},
+      booktitle = {The AAAI Conference on Artificial Intelligence (AAAI)}
+}
+```
 
