@@ -160,7 +160,7 @@ def train(opt):
                                                         Resizer(input_sizes[opt.compound_coef])])
 
     if opt.project == "vcoco":
-        training_set = VCOCO_Dataset(root_dir="./datasets/vcoco", set=params.train_set, color_prob=0.5,
+        training_set = VCOCO_Dataset(root_dir="./datasets/vcoco", set=params.train_set, 
                                transform=train_transform)
         val_set = VCOCO_Dataset(root_dir="./datasets/vcoco", set=params.val_set,
                           transform=val_transform)
