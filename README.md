@@ -69,13 +69,13 @@ Make sure to put the files in the following structure:
 ```
 
 ## Demonstration
-### Demonstration on An Image
+### Demonstration on Images
 
 ```
 CUDA_VISIBLE_DEVICES=0 python demo.py --image_path /path/to/a/single/image
 ```
 
-### Demonstration on A Video
+### Demonstration on Videos
 
 Coming soon.
 
