@@ -14,6 +14,9 @@ The code is developed based on the architecture of [zylo117/Yet-Another-Efficien
 
 + [x] Training and Test for V-COCO dataset
 + [ ] Training and Test for HICO-DET dataset
++ [x] Demonstration on images
++ [ ] Demonstration on videos
++ [ ] More efficient voting strategy for inference using GPU
 
 ## Prerequisites
 
@@ -64,6 +67,17 @@ Make sure to put the files in the following structure:
 |	| 	|	|-- images
 |	|	|	|-- annotations
 ```
+
+## Demonstration
+### Demonstration on An Image
+
+```
+CUDA_VISIBLE_DEVICES=0 python demo.py --image_path /path/to/a/single/image
+```
+
+### Demonstration on A Video
+
+Coming soon.
 
 ## Pre-trained Weights
 
