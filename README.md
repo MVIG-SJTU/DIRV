@@ -68,7 +68,7 @@ Make sure to put the files in the following structure:
 |	|	|-- coco
 |	| 	|	|-- images
 |	|	|	|-- annotations
-|   |   |-- new_prior_mask.pkl   
+|	|	|-- new_prior_mask.pkl   
 ```
 
 ## Demonstration
