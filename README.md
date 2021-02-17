@@ -48,6 +48,8 @@ The code was tested with python 3.6,  pytorch 1.5.1, torchvision 0.6.1, CUDA 10.
 
 Download [V-COCO](https://github.com/s-gupta/v-coco) dataset following the official instructions. 
 
+You can find the file new_prior_mask.pkl [here](https://drive.google.com/drive/folders/14xXUb5l_SugfWiRXX3o8jgKXMNac1c7_?usp=sharing). Each element inside it refers to the prior probability that a verb (e.g. eat) is associated with an object category (e.g. apple).
+
 ### HICO-DET Dataset:
 
 Coming soon.
@@ -66,6 +68,7 @@ Make sure to put the files in the following structure:
 |	|	|-- coco
 |	| 	|	|-- images
 |	|	|	|-- annotations
+|   |   |-- new_prior_mask.pkl   
 ```
 
 ## Demonstration
