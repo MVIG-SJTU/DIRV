@@ -13,7 +13,7 @@ The code is developed based on the architecture of [zylo117/Yet-Another-Efficien
 ## Checklist
 
 + [x] Training and Test for V-COCO dataset
-+ [ ] Training and Test for HICO-DET dataset
++ [x] Training and Test for HICO-DET dataset
 + [x] Demonstration on images
 + [ ] Demonstration on videos
 + [ ] More efficient voting strategy for inference using GPU
@@ -52,7 +52,11 @@ You can find the file new_prior_mask.pkl [here](https://drive.google.com/drive/f
 
 ### HICO-DET Dataset:
 
-Coming soon.
+Download [HICO-DET](http://www-personal.umich.edu/~ywchao/hico/) dataset from the official website.
+
+We transform the annotations of HICO-DET dataset to JSON format following [BigRedT/no_frills_hoi_det](https://github.com/BigRedT/no_frills_hoi_det). You can directly download the processed annotations from [here](https://drive.google.com/drive/folders/14xXUb5l_SugfWiRXX3o8jgKXMNac1c7_?usp=sharing). Thanks for their hard work!
+
+We count the training sample number of each category in [hico_processed/hico-det_verb_count.json](https://drive.google.com/drive/folders/14xXUb5l_SugfWiRXX3o8jgKXMNac1c7_?usp=sharing). It serves as a weight when calculating loss.
 
 ### Dataset Structure:
 
@@ -69,6 +73,9 @@ Make sure to put the files in the following structure:
 |	| 	|	|-- images
 |	|	|	|-- annotations
 |	|	|-- new_prior_mask.pkl   
+|   |-- hico_20160224_det
+|	|	|-- images
+|	|	|-- hico_processed
 ```
 
 ## Demonstration
@@ -84,23 +91,25 @@ Coming soon.
 
 ## Pre-trained Weights
 
-You can download the pre-trained weights for V-COCO dataset (vcoco_best.pth) [here](https://drive.google.com/drive/folders/14xXUb5l_SugfWiRXX3o8jgKXMNac1c7_?usp=sharing).
+You can download the pre-trained weights for V-COCO dataset (vcoco_best.pth) and HICO-DET dataset (hico-det_best.pth) [here](https://drive.google.com/drive/folders/14xXUb5l_SugfWiRXX3o8jgKXMNac1c7_?usp=sharing).
 
 ## Training
 
-Download the pre-trained weight of our backbone [here](https://drive.google.com/drive/folders/14xXUb5l_SugfWiRXX3o8jgKXMNac1c7_?usp=sharing), and save it in `weights/` directory. 
+Download the pre-trained weight of our backbone (efficientdet-d3_vcoco.pth and efficientdet-d3_hico-det.pth) [here](https://drive.google.com/drive/folders/14xXUb5l_SugfWiRXX3o8jgKXMNac1c7_?usp=sharing), and save it in `weights/` directory. 
 
 ### Training on V-COCO Dataset
 
 ```
-CUDA_VISIBLE_DEVICES=0,1,2,3 python train_vcoco.py --batch_size 32 --load_weights weights/efficientdet-d3_vcoco.pth
+CUDA_VISIBLE_DEVICES=0,1,2,3 python train.py -p vcoco --batch_size 32 --load_weights weights/efficientdet-d3_vcoco.pth
 ```
-
-You may adjust the saving directory and GPU number in `projects/vcoco.yaml` or create your own projects in `projects/`.
 
 ### Training on HICO-DET Dataset
 
-Coming soon.
+```
+CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 python train.py -p hico-det --batch_size 48 --load_weights weights/efficientdet-d3_hico-det.pth
+```
+
+You may also adjust the saving directory and GPU number in `projects/vcoco.yaml` and `projects/hico-det.yaml` or create your own projects in `projects/`.
 
 ## Test 
 
@@ -112,7 +121,9 @@ CUDA_VISIBLE_DEVICES=0 python test_vcoco.py -w $path to the checkpoint$
 
 ### Test on HICO-DET Dataset
 
-Coming soon.
+```
+CUDA_VISIBLE_DEVICES=0 python test_hico-det.py -w $path to the checkpoint$
+```
 
 ## Citation
 
