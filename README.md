@@ -74,8 +74,8 @@ Make sure to put the files in the following structure:
 |	|	|	|-- annotations
 |	|	|-- new_prior_mask.pkl   
 |   |-- hico_20160224_det
-|   |   |-- images
-|   |   |-- hico_processed
+|	|	|-- images
+|	|	|-- hico_processed
 ```
 
 ## Demonstration
