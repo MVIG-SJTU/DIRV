@@ -82,9 +82,9 @@ if not os.path.exists(output_dir):
     os.mkdir(output_dir)
 
 if args.flip_test:
-    detection_path = os.path.join(output_dir, f'{SET_NAME}_bbox_results_62794_roletimes_tau_flip.pkl')
+    detection_path = os.path.join(output_dir, f'{SET_NAME}_bbox_results_flip_final.pkl')
 else:
-    detection_path = os.path.join(output_dir, f'{SET_NAME}_bbox_results_62794_roletimes_tau.pkl')
+    detection_path = os.path.join(output_dir, f'{SET_NAME}_bbox_results_final.pkl')
 
 obj_list = ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat', 'traffic light',
            'fire hydrant', '', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep',
@@ -481,9 +481,9 @@ if __name__ == '__main__':
     if override_prev_results or not os.path.exists(detection_path):
         test()
     if args.flip_test:
-        hico_dir = os.path.join(output_dir, f"{project_name}_62794_roletimes_tau_flip/")
+        hico_dir = os.path.join(output_dir, f"{project_name}_flip_final/")
     else:
-        hico_dir = os.path.join(output_dir, f"{project_name}_62794_roletimes_tau/")
+        hico_dir = os.path.join(output_dir, f"{project_name}_final/")
     if not os.path.exists(hico_dir):
         os.mkdir(hico_dir)
     Generate_HICO_detection(detection_path, hico_dir)

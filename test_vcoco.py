@@ -65,7 +65,7 @@ if not os.path.exists(output_dir):
     os.mkdir(output_dir)
 
 if args.flip_test:
-    detection_path = os.path.join(output_dir, f'{SET_NAME}_bbox_results_flip_final.pkl')
+    detection_path = os.path.join(output_dir, f'{SET_NAME}_bbox_results_flip_final.pkl') 
 else:
     detection_path = os.path.join(output_dir, f'{SET_NAME}_bbox_results_final.pkl')
 
