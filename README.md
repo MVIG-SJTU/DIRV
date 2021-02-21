@@ -125,7 +125,7 @@ CUDA_VISIBLE_DEVICES=0 python test_vcoco.py -w $path to the checkpoint$
 CUDA_VISIBLE_DEVICES=0 python test_hico-det.py -w $path to the checkpoint$
 ```
 
-Then please follow the same procedures in [vt-vl-lab/iCAN](https://github.com/vt-vl-lab/iCAN) to evaluate the result.
+Then please follow the same procedures in [vt-vl-lab/iCAN](https://github.com/vt-vl-lab/iCAN) to evaluate the result on HICO-DET dataset.
 
 ## Citation
 
