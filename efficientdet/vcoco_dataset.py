@@ -10,7 +10,7 @@ from PIL import Image, ImageEnhance, ImageOps, ImageFile
 
 from pycocotools.coco import COCO
 import cv2
-
+import random
 from tqdm.autonotebook import tqdm
 
 import datasets.vcoco.vsrl_utils as vu
@@ -303,14 +303,34 @@ def randomColor(image):
     :param image: PIL的图像image
     :return: 有颜色色差的图像image
     """
-    random_factor = np.random.uniform(0.5,2)  # 随机因子
+    func = [color_enhance, brightness_enhance, contrast_enhance, sharpness_enchance]
+    random.shuffle(func)
+    for f in func:
+        image = f(image)
+    return image
+
+
+def color_enhance(image):
+    random_factor = np.random.uniform(0.8, 1.2)  # 随机因子
     color_image = ImageEnhance.Color(image).enhance(random_factor)  # 调整图像的饱和度
-    random_factor = np.random.uniform(0.8, 2)  # 随机因子
-    brightness_image = ImageEnhance.Brightness(color_image).enhance(random_factor)  # 调整图像的亮度
-    random_factor = np.random.uniform(0.8,2)  # 随机因子
-    contrast_image = ImageEnhance.Contrast(brightness_image).enhance(random_factor)  # 调整图像对比度
-    random_factor = np.random.uniform(0.5,2)  # 随机因子
-    sharp_image = ImageEnhance.Sharpness(contrast_image).enhance(random_factor)  # 调整图像锐度
+    return color_image
+
+
+def brightness_enhance(image):
+    random_factor = np.random.uniform(0.8, 1.2)  # 随机因子
+    brightness_image = ImageEnhance.Brightness(image).enhance(random_factor)  # 调整图像的亮度
+    return brightness_image
+
+
+def contrast_enhance(image):
+    random_factor = np.random.uniform(0.8, 1.2)  # 随机因子
+    contrast_image = ImageEnhance.Contrast(image).enhance(random_factor)  # 调整图像对比度
+    return contrast_image
+
+
+def sharpness_enchance(image):
+    random_factor = np.random.uniform(0.8, 1.2)  # 随机因子
+    sharp_image = ImageEnhance.Sharpness(image).enhance(random_factor)  # 调整图像锐度
     return sharp_image
 
 

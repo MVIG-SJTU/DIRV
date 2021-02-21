@@ -94,16 +94,16 @@ class FocalLoss(nn.Module):
             if torch.cuda.is_available():
                 targets = targets.cuda()
 
-            targets[torch.lt(IoU_max, 0.4), :] = 0  # IoU小于0.4
+            targets[torch.lt(IoU_max, 0.4), :] = 0  # IoU < 0.4
 
-            positive_indices = torch.ge(IoU_max, 0.5)  # IoU大于0.5
+            positive_indices = torch.ge(IoU_max, 0.5)  # IoU > 0.5
 
             num_positive_anchors = positive_indices.sum()
 
             assigned_annotations = bbox_annotation[IoU_argmax, :]
 
             targets[positive_indices, :] = 0
-            targets[positive_indices, assigned_annotations[positive_indices, 4].long()] = 1  # 对应类别设为1
+            targets[positive_indices, assigned_annotations[positive_indices, 4].long()] = 1  # set the corresponding categories as 1
 
             alpha_factor = torch.ones_like(targets) * alpha
             if torch.cuda.is_available():
@@ -120,7 +120,7 @@ class FocalLoss(nn.Module):
             zeros = torch.zeros_like(cls_loss)
             if torch.cuda.is_available():
                 zeros = zeros.cuda()
-            cls_loss = torch.where(torch.ne(targets, -1.0), cls_loss, zeros)  # IoU过小处不考虑loss
+            cls_loss = torch.where(torch.ne(targets, -1.0), cls_loss, zeros)  # ignore loss if IoU is too small
 
             classification_losses.append(cls_loss.sum() / torch.clamp(num_positive_anchors.to(dtype), min=1.0))
 
@@ -183,10 +183,21 @@ class FocalLoss(nn.Module):
 
 
 class Instance_Loss(nn.Module):
-    def __init__(self):
+    def __init__(self, dataset="vcoco"):
         super(Instance_Loss,self).__init__()
         self.focal_loss = FocalLoss()
         self.bce_loss = nn.BCELoss()
+        self.dataset = dataset
+        if dataset == "hico-det":
+            with open("hico-det_verb_count.json", "r") as file:
+                verb_count = json.load(file)
+
+            verb_count = verb_count + verb_count
+            verb_count = np.array(verb_count)
+            verb_count = np.log(verb_count)
+            verb_weight = np.mean(verb_count) / verb_count
+            verb_weight = np.round(verb_weight, 1)
+            self.verb_weight = torch.from_numpy(verb_weight)
 
     def forward(self, act_classifications, obj_classifications, obj_regressions, anchors, inst_annotations,  **kwargs):
         anchors = anchors.float()
@@ -234,7 +245,7 @@ class Instance_Loss(nn.Module):
 
             IoU = calc_iou(anchor[:, :], bbox_annotation[:, :4])
 
-            IoU_max, IoU_argmax = torch.max(IoU, dim=1)  # 不同stride
+            IoU_max, IoU_argmax = torch.max(IoU, dim=1)
 
             # compute the loss for classification
             act_targets = torch.ones_like(act_classification) * -1
@@ -243,10 +254,10 @@ class Instance_Loss(nn.Module):
                 act_targets = act_targets.cuda()
                 obj_targets = obj_targets.cuda()
 
-            obj_targets[torch.lt(IoU_max, 0.4), :] = 0  # IoU小于0.4
-            act_targets[torch.lt(IoU_max, 0.4), :] = 0  # IoU小于0.4
+            obj_targets[torch.lt(IoU_max, 0.4), :] = 0  # IoU < 0.4
+            act_targets[torch.lt(IoU_max, 0.4), :] = 0  # IoU < 0.4
 
-            positive_indices = torch.ge(IoU_max, 0.5)  # IoU大于0.5
+            positive_indices = torch.ge(IoU_max, 0.5)  # IoU > 0.5
 
             num_positive_anchors = positive_indices.sum()
 
@@ -256,44 +267,40 @@ class Instance_Loss(nn.Module):
             act_targets[positive_indices, :] = 0
             obj_targets[positive_indices, :] = 0
 
-            obj_targets[positive_indices, assigned_annotations[positive_indices, 4].long()] = 1  # 对应类别设为1
-            act_targets[positive_indices, :] = assigned_act_annotation[positive_indices, :]  # 对应类别设为1
+            obj_targets[positive_indices, assigned_annotations[positive_indices, 4].long()] = 1  # set the corresponding categories as 1
+            act_targets[positive_indices, :] = assigned_act_annotation[positive_indices, :]  # set the corresponding categories as 1
 
             foreground = torch.max(act_targets, dim=1)[0] > 0
             act_targets = act_targets[foreground]
             act_classification = act_classification[foreground]
 
             alpha_factor_obj = torch.ones_like(obj_targets) * alpha
-            # alpha_factor_act = torch.ones_like(act_targets) * alpha
 
             if torch.cuda.is_available():
                 alpha_factor_obj = alpha_factor_obj.cuda()
-            #     alpha_factor_act = alpha_factor_act.cuda()
 
             alpha_factor_obj = torch.where(torch.eq(obj_targets, 1.), alpha_factor_obj, 1. - alpha_factor_obj)
-            # alpha_factor_act = torch.where(torch.eq(act_targets, 1.), alpha_factor_act, 1. - alpha_factor_act)
 
             obj_focal_weight = torch.where(torch.eq(obj_targets, 1.), 1. - obj_classification, obj_classification)
             obj_focal_weight = alpha_factor_obj * torch.pow(obj_focal_weight, gamma)
 
-            # act_focal_weight = torch.where(torch.eq(act_targets, 1.), 1. - act_classification, act_classification)
-            # act_focal_weight = alpha_factor_act * torch.pow(act_focal_weight, gamma)
-
             obj_bce = -(obj_targets * torch.log(obj_classification) + (1.0 - obj_targets) * torch.log(1.0 - obj_classification))
             act_bce = -(act_targets * torch.log(act_classification) + (1.0 - act_targets) * torch.log(1.0 - act_classification))
 
-            obj_cls_loss = obj_focal_weight * obj_bce  # 分类loss
-            # act_cls_loss = act_focal_weight * act_bce
-            # act_cls_loss = act_bce * verb_weight.to(dtype).cuda( )
-            act_cls_loss = act_bce
+            obj_cls_loss = obj_focal_weight * obj_bce  # classification loss
+
+            if self.dataset == "vcoco":
+                act_cls_loss = act_bce
+            else:
+                act_cls_loss = act_bce * self.verb_weight.to(dtype).cuda( )
 
             obj_zeros = torch.zeros_like(obj_cls_loss)
             act_zeros = torch.zeros_like(act_cls_loss)
             if torch.cuda.is_available():
                 obj_zeros = obj_zeros.cuda()
                 act_zeros = act_zeros.cuda()
-            obj_cls_loss = torch.where(torch.ne(obj_targets, -1.0), obj_cls_loss, obj_zeros)  # IoU过小处不考虑loss
-            act_cls_loss = torch.where(torch.ne(act_targets, -1.0), act_cls_loss, act_zeros)  # IoU过小处不考虑loss
+            obj_cls_loss = torch.where(torch.ne(obj_targets, -1.0), obj_cls_loss, obj_zeros)  # ignore loss if IoU is too small
+            act_cls_loss = torch.where(torch.ne(act_targets, -1.0), act_cls_loss, act_zeros)  # ignore loss if IoU is too small
 
             obj_classification_losses.append(obj_cls_loss.sum() / torch.clamp(num_positive_anchors.to(dtype), min=1.0))
             act_classification_losses.append(act_cls_loss.sum() / torch.clamp(num_positive_anchors.to(dtype), min=1.0))
@@ -358,14 +365,25 @@ class Instance_Loss(nn.Module):
 
 
 class Union_Loss(nn.Module):
-    def __init__(self):
+    def __init__(self, dataset="vcoco"):
         super(Union_Loss, self).__init__()
+        self.dataset = dataset
+        if self.dataset == "hico-det":
+            with open("hico-det_verb_count.json", "r") as file:
+                hoi_count = json.load(file)
+
+            hoi_count = np.log(hoi_count)
+            hoi_weight = np.mean(hoi_count) / hoi_count
+            hoi_weight = np.round(hoi_weight, 1)
+            self.hoi_weight = torch.from_numpy(hoi_weight)
 
     def forward(self, act_classifications, sub_regressions, obj_regressions, anchors, union_annotations, **kwargs):
         alpha = 0.25
         gamma = 2.0
         batch_size = act_classifications.shape[0]
+        # obj_classification_losses = []
         act_classification_losses = []
+        # regression_losses = []
         sub_regression_losses = []
         obj_regression_losses = []
         diff_regression_losses = []
@@ -413,14 +431,15 @@ class Union_Loss(nn.Module):
             Union_IoU = (IoU > 0.25) * (IoA_sub > 0.25) * (IoA_obj > 0.25)
             Union_IoU = Union_IoU.float()
 
-            IoU_max_ge, IoU_argmax_ge = torch.max(0.5 * (IoU+torch.sqrt(IoA_sub*IoA_obj))*Union_IoU, dim=1)  # 不同stride, (h*w*anchor_num, )
+            IoU_max_ge, IoU_argmax_ge = torch.max(0.5 * (IoU+torch.sqrt(IoA_sub*IoA_obj))*Union_IoU, dim=1)  # (h*w*anchor_num, )
 
+            # compute the loss for classification
             act_targets = torch.ones_like(act_classification, dtype=torch.float32) * -1 # (h*w*feat_num, num_classes)
 
             if torch.cuda.is_available():
                 act_targets = act_targets.cuda()
 
-            act_targets[torch.lt(IoU_max, 0.4), :] = 0  # IoU小于0.4,
+            act_targets[torch.lt(IoU_max, 0.4), :] = 0  # IoU < 0.4,
 
             positive_indices = torch.max(Union_IoU, dim=1)[0]>0 # (h*w*anchor_num, 1)
             positive_indices_reg = torch.ge(IoU_max_ge, 0.1) # actually same as above
@@ -435,6 +454,8 @@ class Union_Loss(nn.Module):
 
             assigned_act_annotations_ignore = assigned_act_annotation_all_fore - assigned_act_annotation
             assigned_act_annotations_ignore = assigned_act_annotations_ignore[positive_indices]
+            # assert assigned_act_annotations_ignore.max() <= 1
+            # assert assigned_act_annotations_ignore.min() >= 0
 
             act_targets[positive_indices, :] = 0
             act_targets[positive_indices, :] = assigned_act_annotation[positive_indices, :]
@@ -443,12 +464,10 @@ class Union_Loss(nn.Module):
             act_classification = act_classification[positive_indices]
             act_targets = act_targets - assigned_act_annotations_ignore
 
-
             alpha_factor_act = torch.ones_like(act_targets, dtype=torch.float32) * alpha
 
             if torch.cuda.is_available():
                 alpha_factor_act = alpha_factor_act.cuda()
-
             alpha_factor_act = torch.where(torch.eq(act_targets, 1.), alpha_factor_act, 1. - alpha_factor_act)
 
             focal_weight_act = torch.where(torch.eq(act_targets, 1.), 1. - act_classification, act_classification)
@@ -456,11 +475,14 @@ class Union_Loss(nn.Module):
 
             act_bce = -(act_targets * torch.log(act_classification) + (1.0 - act_targets) * torch.log(1.0 - act_classification))
 
-            act_cls_loss = focal_weight_act * act_bce  # 分类loss
+            if self.dataset == "vcoco":
+                act_cls_loss = focal_weight_act * act_bce
+            else:
+                act_cls_loss = focal_weight_act * act_bce * self.hoi_weight.to(dtype).cuda()  # classification loss
 
             act_zeros = torch.zeros_like(act_cls_loss)
 
-            act_cls_loss = torch.where(torch.ne(act_targets, -1.0), act_cls_loss, act_zeros)  # IoU过小处不考虑loss
+            act_cls_loss = torch.where(torch.ne(act_targets, -1.0), act_cls_loss, act_zeros)  # ignore loss if IoU is too small
             act_classification_losses.append(act_cls_loss.sum() / torch.clamp(num_positive_anchors.to(dtype), min=1.0))
 
             if positive_indices_reg.sum() > 0:
