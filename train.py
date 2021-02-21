@@ -486,7 +486,8 @@ def train(opt):
             # scheduler.step()
 
                 scheduler.step(np.mean(val_loss))
-
+                if optimizer.param_groups[0]['lr'] < opt.lr / 100:
+                    break 
                 # Early stopping
                 # if epoch - best_epoch > opt.es_patience > 0:
                 #     print('[Info] Stop training at epoch {}. The lowest loss achieved is {}'.format(epoch, loss))
