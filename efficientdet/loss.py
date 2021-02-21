@@ -189,7 +189,7 @@ class Instance_Loss(nn.Module):
         self.bce_loss = nn.BCELoss()
         self.dataset = dataset
         if dataset == "hico-det":
-            with open("hico-det_verb_count.json", "r") as file:
+            with open("datasets/hico_20160224_det/hico_processed/hico-det_verb_count.json", "r") as file:
                 verb_count = json.load(file)
 
             verb_count = verb_count + verb_count
@@ -369,7 +369,7 @@ class Union_Loss(nn.Module):
         super(Union_Loss, self).__init__()
         self.dataset = dataset
         if self.dataset == "hico-det":
-            with open("hico-det_verb_count.json", "r") as file:
+            with open("datasets/hico_20160224_det/hico_processed/hico-det_verb_count.json", "r") as file:
                 hoi_count = json.load(file)
 
             hoi_count = np.log(hoi_count)
