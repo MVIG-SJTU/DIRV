@@ -6,7 +6,7 @@
 
 Official code implementation for the paper "DIRV: Dense Interaction Region Voting for End-to-End Human-Object Interaction Detection" (AAAI 2021) [paper](https://arxiv.org/abs/2010.01005).
 
-The code is developed based on the architecture of [zylo117/Yet-Another-EfficientDet-Pytorch](https://github.com/zylo117/Yet-Another-EfficientDet-Pytorch). We sincerely thank the author for the excellent work.
+The code is developed based on the architecture of [zylo117/Yet-Another-EfficientDet-Pytorch](https://github.com/zylo117/Yet-Another-EfficientDet-Pytorch). We also follow some data pre-processing and model evaluation methods in [BigRedT/no_frills_hoi_det](https://github.com/BigRedT/no_frills_hoi_det) and [vt-vl-lab/iCAN](https://github.com/vt-vl-lab/iCAN). We sincerely thank the authors for the excellent work.
 
 
 
@@ -54,7 +54,7 @@ You can find the file new_prior_mask.pkl [here](https://drive.google.com/drive/f
 
 Download [HICO-DET](http://www-personal.umich.edu/~ywchao/hico/) dataset from the official website.
 
-We transform the annotations of HICO-DET dataset to JSON format following [BigRedT/no_frills_hoi_det](https://github.com/BigRedT/no_frills_hoi_det). You can directly download the processed annotations from [here](https://drive.google.com/drive/folders/14xXUb5l_SugfWiRXX3o8jgKXMNac1c7_?usp=sharing). Thanks for their hard work!
+We transform the annotations of HICO-DET dataset to JSON format following [BigRedT/no_frills_hoi_det](https://github.com/BigRedT/no_frills_hoi_det). You can directly download the processed annotations from [here](https://drive.google.com/drive/folders/14xXUb5l_SugfWiRXX3o8jgKXMNac1c7_?usp=sharing).
 
 We count the training sample number of each category in [hico_processed/hico-det_verb_count.json](https://drive.google.com/drive/folders/14xXUb5l_SugfWiRXX3o8jgKXMNac1c7_?usp=sharing). It serves as a weight when calculating loss.
 
@@ -124,6 +124,8 @@ CUDA_VISIBLE_DEVICES=0 python test_vcoco.py -w $path to the checkpoint$
 ```
 CUDA_VISIBLE_DEVICES=0 python test_hico-det.py -w $path to the checkpoint$
 ```
+
+Then please follow the same procedures in [vt-vl-lab/iCAN](https://github.com/vt-vl-lab/iCAN) to evaluate the result.
 
 ## Citation
 
