@@ -91,11 +91,11 @@ Coming soon.
 
 ## Pre-trained Weights
 
-You can download the pre-trained weights for V-COCO dataset (vcoco_best.pth) [here](https://drive.google.com/drive/folders/14xXUb5l_SugfWiRXX3o8jgKXMNac1c7_?usp=sharing).
+You can download the pre-trained weights for V-COCO dataset (vcoco_best.pth) and HICO-DET dataset (hico-det_best.pth) [here](https://drive.google.com/drive/folders/14xXUb5l_SugfWiRXX3o8jgKXMNac1c7_?usp=sharing).
 
 ## Training
 
-Download the pre-trained weight of our backbone [here](https://drive.google.com/drive/folders/14xXUb5l_SugfWiRXX3o8jgKXMNac1c7_?usp=sharing), and save it in `weights/` directory. 
+Download the pre-trained weight of our backbone (efficientdet-d3_vcoco.pth and efficientdet-d3_hico-det.pth) [here](https://drive.google.com/drive/folders/14xXUb5l_SugfWiRXX3o8jgKXMNac1c7_?usp=sharing), and save it in `weights/` directory. 
 
 ### Training on V-COCO Dataset
 
